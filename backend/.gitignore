@@ -22,3 +22,10 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+/src/generated/prisma
+
+# Prisma AI helper files
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
