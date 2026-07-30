@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Backend API for the Notes App built with Express.js",
   "main": "src/server.js",
+  
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Tests will be added in Phase 8\"",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
