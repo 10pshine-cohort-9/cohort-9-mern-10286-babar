@@ -6,114 +6,160 @@ Cohort 9 — MERN (NodeJS + ReactJS) assignment for **Babar Rahim**.
 
 # Notes App
 
-## Overview
+A full-stack Notes application built using React.js and Node.js.
 
-This repository currently contains the initial project setup for the Notes App.
-
-### Completed
-
-- Backend project setup
-- Frontend project setup
-
-### Planned
-
-- PostgreSQL Database
-- Prisma ORM
-- User Authentication
-- Notes CRUD APIs
-- Rich Text Editor
-- Pino Logger
-- Global Exception Handling
-- Unit Testing
-- SonarQube
+This project is being developed as part of the **10Pearls Shine MERN Internship** using a feature-branch workflow.
 
 ---
 
-## Technology Stack
+# Overview
 
-### Implemented
+The Notes App is a full-stack application for managing personal notes. Authentication and authorization will be added in upcoming development phases.
 
-#### Backend
+## Implemented in this repository
 
-- Node.js
-- Express.js
-- CORS
-- Helmet
-- dotenv
-- Nodemon
+- Backend project setup
+- Frontend project setup
+- PostgreSQL database configuration
+- Prisma ORM configuration
+- Initial database schema
+- Database migration setup
 
-#### Frontend
+## Planned for future phases
+
+- User Authentication
+- Notes CRUD APIs
+- Rich Text Editor
+- Dashboard
+- Pino Logger
+- Global Exception Handling
+- Unit Testing (Mocha/Chai & Jest)
+- SonarQube Integration
+
+---
+
+# Technology Stack
+
+## Currently Implemented
+
+### Frontend
 
 - React.js
 - Vite
 - React Router
 - Axios
-- Tailwind CSS
 
-### Planned
+### Backend
 
-#### Database
+- Node.js
+- Express.js
+
+### Database
 
 - PostgreSQL
 - Prisma ORM
 
-#### Testing
+---
 
-- Mocha
-- Jest
+## Planned
 
-#### Other
-
+- Authentication
+- Rich Text Editor
 - Pino Logger
+- Mocha / Chai
+- Jest
 - SonarQube
 
 ---
 
-## Folder Structure
+# Folder Structure
 
 ```text
 backend/
+├── prisma/
+│   ├── migrations/
+│   └── schema.prisma
+├── src/
+├── package.json
+└── prisma.config.ts
+
 frontend/
-docs/
+├── src/
+├── public/
+└── package.json
 ```
 
 ---
 
-## Prerequisites
+# Prerequisites
 
-- Node.js
+Install the following before running the project:
+
+- Node.js (v20+)
 - npm
+- PostgreSQL
+- Git
 
 ---
 
-## Installation
+# Installation
 
-### Backend
+Clone the repository
+
+```bash
+git clone <repository-url>
+cd cohort-9-mern-10286-babar
+```
+
+Install backend dependencies
 
 ```bash
 cd backend
 npm install
 ```
 
-### Frontend
+Install frontend dependencies
 
 ```bash
-cd frontend
+cd ../frontend
 npm install
 ```
 
 ---
 
-## Running the Application
+# Running the Application
 
-Backend
+## Backend
 
 ```bash
 cd backend
 npm run dev
 ```
 
-Frontend
+Backend runs on
+
+```text
+http://localhost:5000
+```
+
+Health Check
+
+```text
+GET /
+```
+
+Example Response
+
+```json
+{
+  "success": true,
+  "message": "Notes API is running"
+}
+```
+
+---
+
+## Frontend
 
 ```bash
 cd frontend
@@ -122,21 +168,37 @@ npm run dev
 
 ---
 
-## Current Progress
+# Database
 
-- ✅ Backend Project Setup
-- ✅ Frontend Project Setup
-- ⏳ Database
-- ⏳ Authentication
-- ⏳ Notes CRUD
-- ⏳ Rich Text Editor
-- ⏳ Logging
-- ⏳ Exception Handling
-- ⏳ Testing
-- ⏳ SonarQube
+Current database implementation includes:
+
+- PostgreSQL configuration
+- Prisma ORM configuration
+- Initial migration
+- User model
+- Note model
 
 ---
 
-## License
+# Current Progress
+
+| Phase | Status |
+|--------|--------|
+| Backend Project Setup | ✅ Completed |
+| Frontend Project Setup | ✅ Completed |
+| PostgreSQL Setup | ✅ Completed |
+| Prisma ORM Setup | ✅ Completed |
+| Initial Database Schema | ✅ Completed |
+| Authentication | ⏳ Planned |
+| Notes CRUD | ⏳ Planned |
+| Rich Text Editor | ⏳ Planned |
+| Logging | ⏳ Planned |
+| Exception Handling | ⏳ Planned |
+| Testing | ⏳ Planned |
+| SonarQube | ⏳ Planned |
+
+---
+
+# License
 
 This project is developed as part of the **10Pearls SHINE Cohort 9 MERN Assignment**.
