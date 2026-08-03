@@ -14,7 +14,7 @@ This project is being developed as part of the **10Pearls Shine MERN Internship*
 
 # Overview
 
-The Notes App enables authenticated users to manage personal notes securely.
+The Notes App is a full-stack application for managing personal notes. Authentication and authorization will be added in upcoming development phases.
 
 ## Implemented in this repository
 
@@ -138,13 +138,13 @@ npm run dev
 
 Backend runs on
 
-```
+```text
 http://localhost:5000
 ```
 
 Health Check
 
-```
+```text
 GET /
 ```
 
