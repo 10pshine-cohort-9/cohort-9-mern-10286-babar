@@ -1,3 +1,9 @@
+# cohort-9-mern-10286-babar
+
+Cohort 9 — MERN (NodeJS + ReactJS) assignment for **Babar Rahim**.
+
+---
+
 # Notes App
 
 A full-stack Notes application built using React.js and Node.js.
@@ -195,4 +201,4 @@ Current database implementation includes:
 
 # License
 
-This project is developed for educational purposes as part of the **10Pearls Shine MERN Internship**.
+This project is developed as part of the **10Pearls SHINE Cohort 9 MERN Assignment**.
