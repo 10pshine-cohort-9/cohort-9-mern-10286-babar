@@ -1,9 +1,31 @@
 const validator = require("validator");
 
+const isValidBody = (body) => {
+  return body && typeof body === "object" && !Array.isArray(body);
+};
+
 const validateRegister = (req, res, next) => {
+  if (!isValidBody(req.body)) {
+    return res.status(400).json({
+      success: false,
+      message: "Request body is required.",
+    });
+  }
+
   const { name, email, password } = req.body;
 
-  if (!name || !email || !password) {
+  if (
+    typeof name !== "string" ||
+    typeof email !== "string" ||
+    typeof password !== "string"
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid request data.",
+    });
+  }
+
+  if (!name.trim() || !email.trim() || !password.trim()) {
     return res.status(400).json({
       success: false,
       message: "All fields are required.",
@@ -28,9 +50,26 @@ const validateRegister = (req, res, next) => {
 };
 
 const validateLogin = (req, res, next) => {
+  if (!isValidBody(req.body)) {
+    return res.status(400).json({
+      success: false,
+      message: "Request body is required.",
+    });
+  }
+
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (
+    typeof email !== "string" ||
+    typeof password !== "string"
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid request data.",
+    });
+  }
+
+  if (!email.trim() || !password.trim()) {
     return res.status(400).json({
       success: false,
       message: "Email and password are required.",
