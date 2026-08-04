@@ -14,7 +14,7 @@ This project is being developed as part of the **10Pearls Shine MERN Internship*
 
 # Overview
 
-The Notes App is a full-stack application for managing personal notes. Authentication and authorization will be added in upcoming development phases.
+The Notes App is a full-stack application for managing personal notes. The project currently includes project setup, database configuration, and user authentication APIs. Additional features will be implemented in future phases.
 
 ## Implemented in this repository
 
@@ -24,10 +24,13 @@ The Notes App is a full-stack application for managing personal notes. Authentic
 - Prisma ORM configuration
 - Initial database schema
 - Database migration setup
+- User registration API
+- User login API
+- JWT authentication
+- Protected route example (`GET /api/auth/me`)
 
 ## Planned for future phases
 
-- User Authentication
 - Notes CRUD APIs
 - Rich Text Editor
 - Dashboard
@@ -35,7 +38,6 @@ The Notes App is a full-stack application for managing personal notes. Authentic
 - Global Exception Handling
 - Unit Testing (Mocha/Chai & Jest)
 - SonarQube Integration
-
 ---
 
 # Technology Stack
@@ -51,8 +53,13 @@ The Notes App is a full-stack application for managing personal notes. Authentic
 
 ### Backend
 
+### Backend
+
 - Node.js
 - Express.js
+- Prisma ORM
+- JWT
+- bcrypt
 
 ### Database
 
@@ -157,6 +164,13 @@ Example Response
 }
 ```
 
+Authentication Endpoints
+
+```text
+POST /api/auth/register
+POST /api/auth/login
+GET /api/auth/me
+
 ---
 
 ## Frontend
@@ -189,7 +203,7 @@ Current database implementation includes:
 | PostgreSQL Setup | ✅ Completed |
 | Prisma ORM Setup | ✅ Completed |
 | Initial Database Schema | ✅ Completed |
-| Authentication | ⏳ Planned |
+| Authentication API | ✅ Completed |
 | Notes CRUD | ⏳ Planned |
 | Rich Text Editor | ⏳ Planned |
 | Logging | ⏳ Planned |
