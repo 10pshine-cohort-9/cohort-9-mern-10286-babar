@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { loginUser } from "../../services/auth.api";
-import { saveToken } from "../../services/token.service";
+import { useAuth } from "../../hooks/useAuth";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -38,15 +39,13 @@ function Login() {
       });
       
       const { token } = response.data;
-      
-      saveToken(token);
-      
+
+      login(token);
+
       navigate("/dashboard", { replace: true });
 
     } catch (error) {
-      setError(
-        error.response?.data?.message || "Unable to login."
-      );
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -58,11 +57,14 @@ function Login() {
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Email</label>
+        <label htmlFor="email">
+          Email
+        </label>
 
           <input
-            type="email"
-            name="email"
+           id="email"
+           type="email"
+           name="email"
             value={formData.email}
             onChange={handleChange}
           />
@@ -71,9 +73,12 @@ function Login() {
         <br />
 
         <div>
-          <label>Password</label>
+          <label htmlFor="password">
+            Password
+          </label>
 
           <input
+            id="password"
             type="password"
             name="password"
             value={formData.password}

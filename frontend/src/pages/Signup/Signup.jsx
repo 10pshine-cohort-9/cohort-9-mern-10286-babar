@@ -37,14 +37,11 @@ function Signup() {
         email: formData.email.trim(),
         password: formData.password,
       });
-      
+
       navigate("/login");
     } catch (error) {
-      setError(
-        error.response?.data?.message ||
-        "Unable to register."
-      );
-    } finally {
+      setError(error.message);
+    }finally {
       setLoading(false);
     }
   };
@@ -55,9 +52,12 @@ function Signup() {
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Name</label>
+          <label htmlFor="name">
+            Name
+          </label>
 
           <input
+            id="name"
             type="text"
             name="name"
             value={formData.name}
@@ -68,9 +68,12 @@ function Signup() {
         <br />
 
         <div>
-          <label>Email</label>
+        <label htmlFor="email">
+          Email
+        </label>
 
-          <input
+        <input
+            id="email"
             type="email"
             name="email"
             value={formData.email}
@@ -81,9 +84,12 @@ function Signup() {
         <br />
 
         <div>
-          <label>Password</label>
+        <label htmlFor="password">
+          Password
+        </label>
 
-          <input
+        <input
+            id="password"
             type="password"
             name="password"
             value={formData.password}
