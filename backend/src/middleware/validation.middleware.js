@@ -79,7 +79,39 @@ const validateLogin = (req, res, next) => {
   next();
 };
 
+const validateNote = (req, res, next) => {
+  const { title, content } = req.body;
+
+  if (
+    !req.body ||
+    typeof req.body !== "object" ||
+    Array.isArray(req.body)
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Request body is required.",
+    });
+  }
+
+  if (typeof title !== "string" || typeof content !== "string") {
+    return res.status(400).json({
+      success: false,
+      message: "Title and content must be strings.",
+    });
+  }
+
+  if (!title.trim() || !content.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Title and content are required.",
+    });
+  }
+
+  next();
+};
+
 module.exports = {
   validateRegister,
   validateLogin,
+  validateNote,
 };
