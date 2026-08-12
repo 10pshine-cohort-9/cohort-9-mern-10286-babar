@@ -176,14 +176,67 @@ GET  /api/auth/me
 
 ### Notes Endpoints
 
+All Notes endpoints require JWT authentication.
+
+Include the following header in every request:
+
 ```text
-GET    /api/notes
-GET    /api/notes/:id
-POST   /api/notes
-PUT    /api/notes/:id
+Authorization: Bearer <token>
+```
+
+#### Create Note
+
+```text
+POST /api/notes
+```
+
+Required JSON fields:
+
+```json
+{
+  "title": "My first note",
+  "content": "This is my first note."
+}
+```
+
+#### Get All Notes
+
+```text
+GET /api/notes
+```
+
+Returns all notes belonging to the authenticated user.
+
+#### Get Single Note
+
+```text
+GET /api/notes/:id
+```
+
+Returns a specific note belonging to the authenticated user.
+
+#### Update Note
+
+```text
+PUT /api/notes/:id
+```
+
+Required JSON fields:
+
+```json
+{
+  "title": "Updated title",
+  "content": "Updated note content."
+}
+```
+
+#### Delete Note
+
+```text
 DELETE /api/notes/:id
 ```
----
+
+Deletes a specific note belonging to the authenticated user.
 
 ## Frontend
 

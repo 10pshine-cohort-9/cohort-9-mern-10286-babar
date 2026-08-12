@@ -1,87 +1,122 @@
 const prisma = require("../config/prisma");
 
 const createNote = async ({ title, content, userId }) => {
-  const note = await prisma.note.create({
-    data: {
-      title,
-      content,
-      userId,
-    },
-  });
-
-  return note;
+  try {
+    return await prisma.note.create({
+      data: {
+        title,
+        content,
+        userId,
+      },
+    });
+  } catch (error) {
+    throw new Error("Failed to create note.", {
+      cause: error,
+    });
+  }
 };
 
 const getNotes = async (userId) => {
-  const notes = await prisma.note.findMany({
-    where: {
-      userId,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return notes;
+  try {
+    return await prisma.note.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } catch (error) {
+    throw new Error("Failed to fetch notes.", {
+      cause: error,
+    });
+  }
 };
 
 const getNoteById = async ({ noteId, userId }) => {
-  const note = await prisma.note.findFirst({
-    where: {
-      id: noteId,
-      userId,
-    },
-  });
+  try {
+    const note = await prisma.note.findFirst({
+      where: {
+        id: noteId,
+        userId,
+      },
+    });
 
-  if (!note) {
-    throw new Error("Note not found.");
+    if (!note) {
+      throw new Error("Note not found.");
+    }
+
+    return note;
+  } catch (error) {
+    if (error.message === "Note not found.") {
+      throw error;
+    }
+
+    throw new Error("Failed to fetch note.", {
+      cause: error,
+    });
   }
-
-  return note;
 };
 
 const updateNote = async ({ noteId, userId, title, content }) => {
-  const existingNote = await prisma.note.findFirst({
-    where: {
-      id: noteId,
-      userId,
-    },
-  });
+  try {
+    const result = await prisma.note.updateMany({
+      where: {
+        id: noteId,
+        userId,
+      },
+      data: {
+        title,
+        content,
+      },
+    });
 
-  if (!existingNote) {
-    throw new Error("Note not found.");
+    if (result.count === 0) {
+      throw new Error("Note not found.");
+    }
+
+    return await prisma.note.findFirst({
+      where: {
+        id: noteId,
+        userId,
+      },
+    });
+  } catch (error) {
+    if (error.message === "Note not found.") {
+      throw error;
+    }
+
+    throw new Error("Failed to update note.", {
+      cause: error,
+    });
   }
-
-  const note = await prisma.note.update({
-    where: {
-      id: noteId,
-    },
-    data: {
-      title,
-      content,
-    },
-  });
-
-  return note;
 };
 
 const deleteNote = async ({ noteId, userId }) => {
-  const existingNote = await prisma.note.findFirst({
-    where: {
-      id: noteId,
-      userId,
-    },
-  });
+  try {
+    const result = await prisma.note.deleteMany({
+      where: {
+        id: noteId,
+        userId,
+      },
+    });
 
-  if (!existingNote) {
-    throw new Error("Note not found.");
+    if (result.count === 0) {
+      throw new Error("Note not found.");
+    }
+
+    return {
+      message: "Note deleted successfully.",
+    };
+  } catch (error) {
+    if (error.message === "Note not found.") {
+      throw error;
+    }
+
+    throw new Error("Failed to delete note.", {
+      cause: error,
+    });
   }
-
-  await prisma.note.delete({
-    where: {
-      id: noteId,
-    },
-  });
 };
 
 module.exports = {

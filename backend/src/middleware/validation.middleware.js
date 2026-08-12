@@ -80,8 +80,6 @@ const validateLogin = (req, res, next) => {
 };
 
 const validateNote = (req, res, next) => {
-  const { title, content } = req.body;
-
   if (
     !req.body ||
     typeof req.body !== "object" ||
@@ -92,6 +90,8 @@ const validateNote = (req, res, next) => {
       message: "Request body is required.",
     });
   }
+
+  const { title, content } = req.body;
 
   if (typeof title !== "string" || typeof content !== "string") {
     return res.status(400).json({
