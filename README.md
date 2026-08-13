@@ -14,9 +14,11 @@ This project is being developed as part of the **10Pearls Shine MERN Internship*
 
 # Overview
 
-The project currently includes backend and frontend setup, PostgreSQL integration, Prisma ORM configuration, and JWT-based user authentication.
+The project currently includes backend and frontend setup, PostgreSQL integration, Prisma ORM configuration, and JWT-based user authentication, and Notes CRUD APIs.
 
 ## Implemented in this repository
+
+### Project Setup
 
 - Backend project setup
 - Frontend project setup
@@ -24,20 +26,33 @@ The project currently includes backend and frontend setup, PostgreSQL integratio
 - Prisma ORM configuration
 - Initial database schema
 - Database migration setup
+
+### Authentication
+
 - User registration API
 - User login API
 - JWT authentication
-- Protected route example (`GET /api/auth/me`)
+- Protected authentication routes
+- Authenticated user identification through JWT
+
+### Notes
+
+- Create note
+- Get all notes for the authenticated user
+- Get a single note by ID
+- Update note
+- Delete note
+- Notes are associated with the authenticated user
 
 ## Planned for future phases
 
-- Notes CRUD APIs
 - Rich Text Editor
 - Dashboard
 - Pino Logger
 - Global Exception Handling
 - Unit Testing (Mocha/Chai & Jest)
 - SonarQube Integration
+
 ---
 
 # Technology Stack
@@ -158,7 +173,70 @@ POST /api/auth/register
 POST /api/auth/login
 GET  /api/auth/me
 ```
----
+
+### Notes Endpoints
+
+All Notes endpoints require JWT authentication.
+
+Include the following header in every request:
+
+```text
+Authorization: Bearer <token>
+```
+
+#### Create Note
+
+```text
+POST /api/notes
+```
+
+Required JSON fields:
+
+```json
+{
+  "title": "My first note",
+  "content": "This is my first note."
+}
+```
+
+#### Get All Notes
+
+```text
+GET /api/notes
+```
+
+Returns all notes belonging to the authenticated user.
+
+#### Get Single Note
+
+```text
+GET /api/notes/:id
+```
+
+Returns a specific note belonging to the authenticated user.
+
+#### Update Note
+
+```text
+PUT /api/notes/:id
+```
+
+Required JSON fields:
+
+```json
+{
+  "title": "Updated title",
+  "content": "Updated note content."
+}
+```
+
+#### Delete Note
+
+```text
+DELETE /api/notes/:id
+```
+
+Deletes a specific note belonging to the authenticated user.
 
 ## Frontend
 
@@ -197,7 +275,7 @@ Current database implementation includes:
 | Prisma ORM Setup | ✅ Completed |
 | Initial Database Schema | ✅ Completed |
 | Authentication | ✅ Completed |
-| Notes CRUD | ⏳ Planned |
+| Notes CRUD | ✅ Completed |
 | Rich Text Editor | ⏳ Planned |
 | Logging | ⏳ Planned |
 | Exception Handling | ⏳ Planned |
