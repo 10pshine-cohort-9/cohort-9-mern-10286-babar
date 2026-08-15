@@ -1,28 +1,39 @@
-import { createContext, useState } from "react";
-import { getToken, saveToken, removeToken } from "../services/token.service";
+import { useState } from "react";
 
-export const AuthContext = createContext();
+import AuthContext from "./auth.context";
+import {
+  saveToken,
+  getToken,
+  removeToken,
+} from "../services/token.service";
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const token = getToken();
+function AuthProvider({ children }) {
+  const [token, setToken] = useState(getToken());
 
-    return token ? { token } : null;
-  });
-
-  const login = (token) => {
-    saveToken(token);
-    setUser({ token });
+  const login = (newToken) => {
+    saveToken(newToken);
+    setToken(newToken);
   };
 
   const logout = () => {
     removeToken();
-    setUser(null);
+    setToken(null);
   };
 
+  const isAuthenticated = Boolean(token);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        isAuthenticated,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
+
+export default AuthProvider;

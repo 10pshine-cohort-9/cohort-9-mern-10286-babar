@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { loginUser } from "../../services/auth.api";
 import { useAuth } from "../../hooks/useAuth";
@@ -14,7 +14,6 @@ function Login() {
   });
 
   const [error, setError] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
@@ -37,15 +36,14 @@ function Login() {
         email: formData.email.trim(),
         password: formData.password,
       });
-      
+
       const { token } = response.data;
 
       login(token);
 
       navigate("/dashboard", { replace: true });
-
     } catch (error) {
-      setError(error.message);
+      setError(error.message || "Unable to login.");
     } finally {
       setLoading(false);
     }
@@ -57,25 +55,22 @@ function Login() {
 
       <form onSubmit={handleSubmit}>
         <div>
-        <label htmlFor="email">
-          Email
-        </label>
+          <label htmlFor="email">Email</label>
 
           <input
-           id="email"
-           type="email"
-           name="email"
+            id="email"
+            type="email"
+            name="email"
             value={formData.email}
             onChange={handleChange}
+            required
           />
         </div>
 
         <br />
 
         <div>
-          <label htmlFor="password">
-            Password
-          </label>
+          <label htmlFor="password">Password</label>
 
           <input
             id="password"
@@ -83,6 +78,7 @@ function Login() {
             name="password"
             value={formData.password}
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -94,6 +90,10 @@ function Login() {
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
+
+      <p>
+        Don't have an account? <Link to="/signup">Sign up</Link>
+      </p>
     </div>
   );
 }
