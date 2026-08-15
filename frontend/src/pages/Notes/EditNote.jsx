@@ -70,6 +70,18 @@ function EditNote() {
     return <p>Loading note...</p>;
   }
 
+  if (error){
+    return (
+      <div>
+        <p>{error}</p>
+  
+        <button type="button" onClick={() => navigate("/notes")}>
+          Back to Notes
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1>Edit Note</h1>

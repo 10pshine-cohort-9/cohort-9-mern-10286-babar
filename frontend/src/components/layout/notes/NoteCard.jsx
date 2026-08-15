@@ -1,28 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
-import { deleteNote } from "../../../services/note.api";
 
 function NoteCard({ note, onDelete }) {
   const navigate = useNavigate();
 
-  const handleDelete = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this note?"
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await deleteNote(note.id);
-
-      onDelete(note.id);
-    } catch (error) {
-      alert(error.message || "Unable to delete note.");
-    }
+  const handleDelete = () => {
+    onDelete(note.id);
   };
-
+  
   return (
     <article>
       <h2>{note.title}</h2>
