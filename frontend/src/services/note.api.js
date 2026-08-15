@@ -13,7 +13,7 @@ export const getNotes = async () => {
   }
 };
 
-export const getNoteById = async (id) => {
+export const getNote  = async (id) => {
   try {
     const response = await api.get(`/notes/${id}`);
 
