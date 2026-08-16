@@ -5,9 +5,17 @@ function NoteCard({ note, onDelete }) {
   const navigate = useNavigate();
 
   const handleDelete = () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this note?"
+    );
+  
+    if (!confirmed) {
+      return;
+    }
+  
     onDelete(note.id);
   };
-  
+
   return (
     <article>
       <h2>{note.title}</h2>
