@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { registerUser } from "../../services/auth.api";
 
@@ -12,9 +12,8 @@ function Signup() {
     password: "",
   });
 
-  const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -28,8 +27,8 @@ function Signup() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setLoading(true);
     setError("");
+    setLoading(true);
 
     try {
       await registerUser({
@@ -38,23 +37,21 @@ function Signup() {
         password: formData.password,
       });
 
-      navigate("/login");
+      navigate("/login", { replace: true });
     } catch (error) {
-      setError(error.message);
-    }finally {
+      setError(error.message || "Unable to register.");
+    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div>
-      <h1>Create Account</h1>
+      <h1>Sign Up</h1>
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="name">
-            Name
-          </label>
+          <label htmlFor="name">Name</label>
 
           <input
             id="name"
@@ -62,38 +59,37 @@ function Signup() {
             name="name"
             value={formData.name}
             onChange={handleChange}
+            required
           />
         </div>
 
         <br />
 
         <div>
-        <label htmlFor="email">
-          Email
-        </label>
+          <label htmlFor="email">Email</label>
 
-        <input
+          <input
             id="email"
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
+            required
           />
         </div>
 
         <br />
 
         <div>
-        <label htmlFor="password">
-          Password
-        </label>
+          <label htmlFor="password">Password</label>
 
-        <input
+          <input
             id="password"
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -102,9 +98,13 @@ function Signup() {
         {error && <p>{error}</p>}
 
         <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Account"}
+          {loading ? "Creating account..." : "Sign Up"}
         </button>
       </form>
+
+      <p>
+        Already have an account? <Link to="/login">Login</Link>
+      </p>
     </div>
   );
 }
