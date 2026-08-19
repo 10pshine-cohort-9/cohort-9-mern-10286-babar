@@ -9,11 +9,15 @@ const requestLogger = pinoHttp({
     return 'info';
   },
   serializers: {
-    req: (req) => ({
-      method: req.method,
-      url: req.url,
-      clientIp: req.remoteAddress
-    }),
+    req: (req) => {
+      const pathname = req.url ? req.url.split('?')[0] : '';
+      
+      return {
+        method: req.method,
+        url: pathname, 
+        clientIp: req.remoteAddress
+      };
+    },
     res: (res) => ({
       statusCode: res.statusCode,
     }),

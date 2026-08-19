@@ -21,24 +21,22 @@ const globalErrorHandler = (err, req, res, next) => {
 
   let error = { ...err, message: err.message, name: err.name, code: err.code, meta: err.meta };
 
-  // 1. Map Prisma Database Errors
   if (error.code && error.code.startsWith('P')) error = handlePrismaError(error);
   
-  // 2. Map Auth Errors
   if (error.name === 'JsonWebTokenError') error = handleJWTError();
   if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
 
-  // 3. Log the error for debugging
   if (error.statusCode >= 500) {
-    logger.error(`[UNEXPECTED ERROR] 💥: ${err.message}`, err);
+    logger.error({ err }, '[UNEXPECTED ERROR] 💥: %s', err.message);
   } else {
     logger.warn(`[OPERATIONAL ERROR]: ${error.message}`);
   }
 
-  // 4. Send Response
-  res.status(error.statusCode).json({
-    status: error.status,
-    message: error.message,
+  const isOperational = error.isOperational === true;
+  
+  res.status(isOperational ? error.statusCode : 500).json({
+    status: isOperational ? error.status : 'error',
+    message: isOperational ? error.message : 'Internal server error.',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 };
