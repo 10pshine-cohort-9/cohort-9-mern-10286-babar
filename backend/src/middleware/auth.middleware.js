@@ -1,36 +1,27 @@
 const { verifyToken } = require("../utils/jwt");
 const prisma = require("../config/prisma");
+const AppError = require("../utils/AppError");
 
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({
-      success: false,
-      message: "Authorization token is required.",
-    });
+    return next(new AppError("Authorization token is required.", 401));
   }
 
   const parts = authHeader.split(" ");
 
   if (parts.length !== 2 || parts[0] !== "Bearer") {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid authorization format.",
-    });
+    return next(new AppError("Invalid authorization format.", 401));
   }
 
   const token = parts[1];
-
   let payload;
 
   try {
     payload = verifyToken(token);
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired token.",
-    });
+    return next(new AppError("Invalid or expired token.", 401));
   }
 
   try {
@@ -46,14 +37,10 @@ const authenticate = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "User not found.",
-      });
+      return next(new AppError("User not found.", 401));
     }
 
     req.user = user;
-
     next();
   } catch (error) {
     return next(error);
