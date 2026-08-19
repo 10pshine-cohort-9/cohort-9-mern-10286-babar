@@ -1,4 +1,5 @@
 const validator = require("validator");
+const AppError = require("../utils/AppError");
 
 const isValidBody = (body) => {
   return body && typeof body === "object" && !Array.isArray(body);
@@ -6,10 +7,7 @@ const isValidBody = (body) => {
 
 const validateRegister = (req, res, next) => {
   if (!isValidBody(req.body)) {
-    return res.status(400).json({
-      success: false,
-      message: "Request body is required.",
-    });
+    return next(new AppError("Request body is required.", 400));
   }
 
   const { name, email, password } = req.body;
@@ -19,31 +17,19 @@ const validateRegister = (req, res, next) => {
     typeof email !== "string" ||
     typeof password !== "string"
   ) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid request data.",
-    });
+    return next(new AppError("Invalid request data.", 400));
   }
 
   if (!name.trim() || !email.trim() || !password.trim()) {
-    return res.status(400).json({
-      success: false,
-      message: "All fields are required.",
-    });
+    return next(new AppError("All fields are required.", 400));
   }
 
   if (!validator.isEmail(email)) {
-    return res.status(400).json({
-      success: false,
-      message: "Please provide a valid email address.",
-    });
+    return next(new AppError("Please provide a valid email address.", 400));
   }
 
   if (password.length < 8) {
-    return res.status(400).json({
-      success: false,
-      message: "Password must be at least 8 characters long.",
-    });
+    return next(new AppError("Password must be at least 8 characters long.", 400));
   }
 
   next();
@@ -51,29 +37,17 @@ const validateRegister = (req, res, next) => {
 
 const validateLogin = (req, res, next) => {
   if (!isValidBody(req.body)) {
-    return res.status(400).json({
-      success: false,
-      message: "Request body is required.",
-    });
+    return next(new AppError("Request body is required.", 400));
   }
 
   const { email, password } = req.body;
 
-  if (
-    typeof email !== "string" ||
-    typeof password !== "string"
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid request data.",
-    });
+  if (typeof email !== "string" || typeof password !== "string") {
+    return next(new AppError("Invalid request data.", 400));
   }
 
   if (!email.trim() || !password.trim()) {
-    return res.status(400).json({
-      success: false,
-      message: "Email and password are required.",
-    });
+    return next(new AppError("Email and password are required.", 400));
   }
 
   next();
@@ -85,26 +59,17 @@ const validateNote = (req, res, next) => {
     typeof req.body !== "object" ||
     Array.isArray(req.body)
   ) {
-    return res.status(400).json({
-      success: false,
-      message: "Request body is required.",
-    });
+    return next(new AppError("Request body is required.", 400));
   }
 
   const { title, content } = req.body;
 
   if (typeof title !== "string" || typeof content !== "string") {
-    return res.status(400).json({
-      success: false,
-      message: "Title and content must be strings.",
-    });
+    return next(new AppError("Title and content must be strings.", 400));
   }
 
   if (!title.trim() || !content.trim()) {
-    return res.status(400).json({
-      success: false,
-      message: "Title and content are required.",
-    });
+    return next(new AppError("Title and content are required.", 400));
   }
 
   next();
