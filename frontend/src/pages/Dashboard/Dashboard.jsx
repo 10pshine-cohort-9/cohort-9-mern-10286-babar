@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getNotes, deleteNote } from '../../services/note.api';
+import { removeToken } from '../../services/token.service';
 
 const Dashboard = () => {
   const [notes, setNotes] = useState([]);
@@ -9,7 +10,6 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   
-  // Modal states
   const [noteToDelete, setNoteToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewingNote, setViewingNote] = useState(null);
@@ -17,7 +17,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    removeToken();
     navigate('/login');
   };
 
@@ -45,7 +45,7 @@ const Dashboard = () => {
       await deleteNote(noteToDelete);
       setNotes(notes.filter((note) => note.id !== noteToDelete));
       setNoteToDelete(null);
-      setViewingNote(null); // Close read modal if open for this note
+      setViewingNote(null);
     } catch (err) {
       alert(err.message || 'Failed to delete note.');
     } finally {
@@ -53,10 +53,11 @@ const Dashboard = () => {
     }
   };
 
+  const query = searchQuery.toLowerCase();
   const filteredNotes = notes.filter((note) => {
     const matchesSearch =
-      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      note.content.toLowerCase().includes(searchQuery.toLowerCase());
+      (note.title || '').toLowerCase().includes(query) ||
+      (note.content || '').toLowerCase().includes(query);
     
     if (activeTab === 'recent') {
       const noteDate = new Date(note.createdAt);
@@ -270,7 +271,7 @@ const Dashboard = () => {
 
       </main>
 
-      {/* Read Note Full View Modal with Proper Scroll View & Edit/Delete Actions */}
+      {/* Read Note Full View Modal with Scroll View & Edit/Delete Actions */}
       {viewingNote && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl border border-stone-100 flex flex-col max-h-[85vh]">
@@ -291,7 +292,7 @@ const Dashboard = () => {
               </button>
             </div>
 
-            {/* Scrollable Content Body with proper min-h-0 constraint */}
+            {/* Scrollable Content Body with min-h-0 constraint */}
             <div className="flex-1 overflow-y-auto pr-2 my-2 min-h-0">
               <p className="text-stone-700 leading-relaxed whitespace-pre-line text-sm sm:text-base font-normal">
                 {viewingNote.content}
@@ -307,9 +308,6 @@ const Dashboard = () => {
                   to={`/notes/edit/${viewingNote.id}`}
                   className="px-4 py-2 rounded-full bg-teal-50 text-teal-700 font-medium text-xs hover:bg-teal-100 transition-colors flex items-center gap-1.5"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
                   Edit
                 </Link>
 
@@ -317,9 +315,6 @@ const Dashboard = () => {
                   onClick={() => setNoteToDelete(viewingNote.id)}
                   className="px-4 py-2 rounded-full bg-red-50 text-red-600 font-medium text-xs hover:bg-red-100 transition-colors flex items-center gap-1.5"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
                   Delete
                 </button>
 

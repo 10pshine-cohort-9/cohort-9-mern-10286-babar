@@ -9,6 +9,7 @@ const EditNote = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
+  const [loadFailed, setLoadFailed] = useState(false);
 
   const navigate = useNavigate();
 
@@ -24,9 +25,11 @@ const EditNote = () => {
           setContent(note.content || '');
         } else {
           setError('Note not found.');
+          setLoadFailed(true);
         }
       } catch (err) {
         setError(err.message || 'Failed to load note details.');
+        setLoadFailed(true);
       } finally {
         setIsLoading(false);
       }
@@ -60,6 +63,17 @@ const EditNote = () => {
           </svg>
           <p className="text-sm font-medium text-stone-500">Loading your note...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (loadFailed) {
+    return (
+      <div className="min-h-screen bg-[#FAFAF9] flex flex-col items-center justify-center gap-4 font-sans px-4 text-center">
+        <p className="text-sm font-medium text-red-600">{error}</p>
+        <Link to="/dashboard" className="px-6 py-3 rounded-full bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 transition-all">
+          Return to Dashboard
+        </Link>
       </div>
     );
   }
@@ -151,7 +165,7 @@ const EditNote = () => {
             </form>
           </div>
 
-          {/* Right Column - Info Sidebar (Green Theme Matching Create Note) */}
+          {/* Right Column - Info Sidebar */}
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-3xl border border-stone-200/60 shadow-sm">
               <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-4">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/auth.api'; 
+import { saveToken } from '../../services/token.service';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,20 +21,15 @@ const Login = () => {
 
     try {
       const response = await loginUser({ email, password });
-      
-      console.log("Full login response object:", response);
-
       const token = response?.data?.token;
 
       if (token) {
-        localStorage.setItem('token', token);
-        console.log("Token saved successfully, navigating to dashboard...");
+        saveToken(token);
         navigate('/dashboard'); 
       } else {
         throw new Error('Token not found in response data.');
       }
     } catch (err) {
-      console.error("Login catch error:", err);
       setError(err.response?.data?.message || err.message || 'Invalid email or password. Please try again.');
     } finally {
       setIsLoading(false);

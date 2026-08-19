@@ -20,13 +20,9 @@ const Signup = () => {
     setError('');
 
     try {
-      // Execute backend API call
       await registerUser({ name, email, password });
-      
-      // Redirect to login page on successful account creation
       navigate('/login');
     } catch (err) {
-      // Extract error message (e.g., "Email is already registered.")
       setError(err.response?.data?.message || 'Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
@@ -116,6 +112,7 @@ const Signup = () => {
                     name="password"
                     type={showPassword ? "text" : "password"}
                     required
+                    minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="appearance-none block w-full px-4 py-3 pr-12 border border-stone-200 rounded-2xl text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all sm:text-sm"
