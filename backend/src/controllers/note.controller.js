@@ -17,10 +17,10 @@ const create = async (req, res, next) => {
       userId: req.user.id,
     });
 
-    // Emit real-time event
+    // Broadcast globally to all connected clients
     const io = req.app.get("io");
     if (io) {
-      io.to(`user_${req.user.id}`).emit("note_created", note);
+      io.emit("note_created", note);
     }
 
     return res.status(201).json({
@@ -72,10 +72,10 @@ const update = async (req, res, next) => {
       content: req.body.content,
     });
 
-    // Emit real-time event
+    // Broadcast globally to all connected clients
     const io = req.app.get("io");
     if (io) {
-      io.to(`user_${req.user.id}`).emit("note_updated", note);
+      io.emit("note_updated", note);
     }
 
     return res.status(200).json({
@@ -95,10 +95,10 @@ const remove = async (req, res, next) => {
       userId: req.user.id,
     });
 
-    // Emit real-time event
+    // Broadcast globally to all connected clients
     const io = req.app.get("io");
     if (io) {
-      io.to(`user_${req.user.id}`).emit("note_deleted", { id: req.params.id });
+      io.emit("note_deleted", { id: req.params.id });
     }
 
     return res.status(200).json({
@@ -128,10 +128,10 @@ const importNotes = async (req, res, next) => {
   try {
     const result = await importUserNotes(req.user.id, req.body.notes);
 
-    // Emit real-time event for bulk import
+    // Broadcast globally for bulk import
     const io = req.app.get("io");
     if (io) {
-      io.to(`user_${req.user.id}`).emit("notes_imported", { count: result.importedCount });
+      io.emit("notes_imported", { count: result.importedCount });
     }
 
     return res.status(201).json({
