@@ -4,6 +4,8 @@ const {
   getNoteById,
   updateNote,
   deleteNote,
+  exportUserNotes,
+  importUserNotes,
 } = require("../services/note.service");
 const AppError = require("../utils/AppError");
 
@@ -14,6 +16,12 @@ const create = async (req, res, next) => {
       content: req.body.content,
       userId: req.user.id,
     });
+
+    // Broadcast globally to all connected clients
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("note_created", note);
+    }
 
     return res.status(201).json({
       success: true,
@@ -27,7 +35,8 @@ const create = async (req, res, next) => {
 
 const getAll = async (req, res, next) => {
   try {
-    const notes = await getNotes(req.user.id);
+    const { search } = req.query;
+    const notes = await getNotes(req.user.id, search);
 
     return res.status(200).json({
       success: true,
@@ -63,6 +72,12 @@ const update = async (req, res, next) => {
       content: req.body.content,
     });
 
+    // Broadcast globally to all connected clients
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("note_updated", note);
+    }
+
     return res.status(200).json({
       success: true,
       message: "Note updated successfully.",
@@ -80,9 +95,49 @@ const remove = async (req, res, next) => {
       userId: req.user.id,
     });
 
+    // Broadcast globally to all connected clients
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("note_deleted", { id: req.params.id });
+    }
+
     return res.status(200).json({
       success: true,
       message: "Note deleted successfully.",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const exportNotes = async (req, res, next) => {
+  try {
+    const notes = await exportUserNotes(req.user.id);
+
+    return res.status(200).json({
+      success: true,
+      count: notes.length,
+      data: notes,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const importNotes = async (req, res, next) => {
+  try {
+    const result = await importUserNotes(req.user.id, req.body.notes);
+
+    // Broadcast globally for bulk import
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("notes_imported", { count: result.importedCount });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: result.message,
+      importedCount: result.importedCount,
     });
   } catch (error) {
     return next(error);
@@ -95,4 +150,6 @@ module.exports = {
   getOne,
   update,
   remove,
+  exportNotes,
+  importNotes,
 };
