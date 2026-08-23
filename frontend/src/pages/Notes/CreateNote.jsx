@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createNote } from '../../services/note.api';
+import NoteForm from '../../components/layout/notes/NoteForm';
 
 const CreateNote = () => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [formData, setFormData] = useState({ title: '', content: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +21,7 @@ const CreateNote = () => {
     setError('');
 
     try {
-      await createNote({ title, content });
+      await createNote(formData);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Failed to create note. Please try again.');
@@ -45,7 +50,7 @@ const CreateNote = () => {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           
-          {/* Left Column - Form (Takes 2 columns) */}
+          {/* Left Column - Form */}
           <div className="lg:col-span-2 bg-white py-10 px-6 sm:px-10 rounded-3xl shadow-xl shadow-stone-200/40 border border-stone-200/60">
             <div className="mb-8">
               <h1 className="text-2xl font-bold tracking-tight text-stone-900">Create Note</h1>
@@ -61,55 +66,13 @@ const CreateNote = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="title" className="block text-sm font-semibold text-stone-700 mb-2">
-                  Note Title
-                </label>
-                <input
-                  id="title"
-                  type="text"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g., Project Architecture Overview"
-                  className="w-full px-4 py-3.5 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all text-sm font-medium"
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="content" className="block text-sm font-semibold text-stone-700 mb-2">
-                  Note Content
-                </label>
-                <textarea
-                  id="content"
-                  rows="10"
-                  required
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write your note body here..."
-                  className="w-full px-4 py-3.5 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all text-sm leading-relaxed resize-y"
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-4 pt-4 border-t border-stone-100">
-                <Link
-                  to="/dashboard"
-                  className="px-6 py-3 rounded-full text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors"
-                >
-                  Cancel
-                </Link>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="px-8 py-3 rounded-full bg-teal-600 text-white font-medium text-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm shadow-teal-600/20"
-                >
-                  {isLoading ? 'Saving note...' : 'Save Note'}
-                </button>
-              </div>
-            </form>
+            <NoteForm
+              formData={formData}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              loading={isLoading}
+              submitText="Save Note"
+            />
           </div>
 
           {/* Right Column - Writing Tips & Shortcuts Sidebar */}

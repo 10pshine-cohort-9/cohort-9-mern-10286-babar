@@ -8,13 +8,13 @@ Cohort 9 — MERN (NodeJS + ReactJS) assignment for **Babar Rahim**.
 
 A full-stack Notes application built using React.js and Node.js.
 
-This project is being developed as part of the **10Pearls Shine MERN Internship** using a feature-branch workflow.
+This project is being developed as part of the **10Pearls SHINE MERN Internship** using a feature-branch workflow.
 
 ---
 
 # Overview
 
-The project currently includes backend and frontend setup, PostgreSQL integration, Prisma ORM configuration, and JWT-based user authentication, and Notes CRUD APIs.
+The project includes backend and frontend setup, PostgreSQL integration, Prisma ORM configuration, JWT-based user authentication, Notes CRUD APIs, a Rich Text Editor, Dashboard, Pino Logger, and Global Exception Handling.
 
 ## Implemented in this repository
 
@@ -44,12 +44,26 @@ The project currently includes backend and frontend setup, PostgreSQL integratio
 - Delete note
 - Notes are associated with the authenticated user
 
+### Rich Text Editor
+
+- Rich text editing support for notes
+
+### Dashboard
+
+- Dashboard for managing and viewing notes
+
+### Logging
+
+- Pino Logger integration
+- Application logging for backend operations
+
+### Global Exception Handling
+
+- Centralized error/exception handling
+- Consistent error responses for API errors
+
 ## Planned for future phases
 
-- Rich Text Editor
-- Dashboard
-- Pino Logger
-- Global Exception Handling
 - Unit Testing (Mocha/Chai & Jest)
 - SonarQube Integration
 
@@ -57,27 +71,33 @@ The project currently includes backend and frontend setup, PostgreSQL integratio
 
 # Technology Stack
 
-## Currently Implemented
-
-### Frontend
+## Frontend
 
 - React.js
 - Vite
 - React Router
 - Axios
+- Rich Text Editor
 
-### Backend
+## Backend
 
 - Node.js
 - Express.js
 - Prisma ORM
 - JWT
 - bcrypt
+- Pino
 
-### Database
+## Database
 
 - PostgreSQL
 - Prisma ORM
+
+## Code Quality & Testing
+
+- Mocha/Chai
+- Jest
+- SonarQube
 
 ---
 
@@ -85,6 +105,7 @@ The project currently includes backend and frontend setup, PostgreSQL integratio
 
 ```text
 backend/
+
 ├── prisma/
 │   ├── migrations/
 │   └── schema.prisma
@@ -117,6 +138,7 @@ Clone the repository
 
 ```bash
 git clone <repository-url>
+
 cd cohort-9-mern-10286-babar
 ```
 
@@ -124,6 +146,7 @@ Install backend dependencies
 
 ```bash
 cd backend
+
 npm install
 ```
 
@@ -131,6 +154,7 @@ Install frontend dependencies
 
 ```bash
 cd ../frontend
+
 npm install
 ```
 
@@ -142,6 +166,7 @@ npm install
 
 ```bash
 cd backend
+
 npm run dev
 ```
 
@@ -242,6 +267,7 @@ Deletes a specific note belonging to the authenticated user.
 
 ```bash
 cd frontend
+
 npm run dev
 ```
 
@@ -276,11 +302,12 @@ Current database implementation includes:
 | Initial Database Schema | ✅ Completed |
 | Authentication | ✅ Completed |
 | Notes CRUD | ✅ Completed |
-| Rich Text Editor | ⏳ Planned |
-| Logging | ⏳ Planned |
-| Exception Handling | ⏳ Planned |
-| Testing | ⏳ Planned |
-| SonarQube | ⏳ Planned |
+| Rich Text Editor | ✅ Completed |
+| Dashboard | ✅ Completed |
+| Logging | ✅ Completed |
+| Exception Handling | ✅ Completed |
+| Testing | ⏳ Pending |
+| SonarQube | ⏳ Pending |
 
 ---
 

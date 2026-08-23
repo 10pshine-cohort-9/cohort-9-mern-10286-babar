@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getNote, updateNote } from '../../services/note.api';
+import NoteForm from '../../components/layout/notes/NoteForm';
 
 const EditNote = () => {
   const { id } = useParams();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [formData, setFormData] = useState({ title: '', content: '' });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
@@ -21,8 +21,10 @@ const EditNote = () => {
         const note = response?.data?.note || response?.note || response?.data;
         
         if (note) {
-          setTitle(note.title || '');
-          setContent(note.content || '');
+          setFormData({
+            title: note.title || '',
+            content: note.content || ''
+          });
         } else {
           setError('Note not found.');
           setLoadFailed(true);
@@ -38,13 +40,18 @@ const EditNote = () => {
     fetchNoteData();
   }, [id]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
     setError('');
 
     try {
-      await updateNote(id, { title, content });
+      await updateNote(id, formData);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Failed to update note. Please try again.');
@@ -114,55 +121,13 @@ const EditNote = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="title" className="block text-sm font-semibold text-stone-700 mb-2">
-                  Note Title
-                </label>
-                <input
-                  id="title"
-                  type="text"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Note title..."
-                  className="w-full px-4 py-3.5 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all text-sm font-medium"
-                  disabled={isSaving}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="content" className="block text-sm font-semibold text-stone-700 mb-2">
-                  Note Content
-                </label>
-                <textarea
-                  id="content"
-                  rows="10"
-                  required
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Note content..."
-                  className="w-full px-4 py-3.5 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all text-sm leading-relaxed resize-y"
-                  disabled={isSaving}
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-4 pt-4 border-t border-stone-100">
-                <Link
-                  to="/dashboard"
-                  className="px-6 py-3 rounded-full text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors"
-                >
-                  Cancel
-                </Link>
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="px-8 py-3 rounded-full bg-teal-600 text-white font-medium text-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm shadow-teal-600/20"
-                >
-                  {isSaving ? 'Saving changes...' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
+            <NoteForm
+              formData={formData}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              loading={isSaving}
+              submitText="Save Changes"
+            />
           </div>
 
           {/* Right Column - Info Sidebar */}
