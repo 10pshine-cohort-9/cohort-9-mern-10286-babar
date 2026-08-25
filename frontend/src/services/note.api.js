@@ -1,8 +1,9 @@
 import api from "./api";
 
-export const getNotes = async () => {
+export const getNotes = async (searchQuery = "") => {
   try {
-    const response = await api.get("/notes");
+    const url = searchQuery ? `/notes?search=${encodeURIComponent(searchQuery)}` : "/notes";
+    const response = await api.get(url);
 
     return response.data;
   } catch (error) {
@@ -60,6 +61,31 @@ export const deleteNote = async (id) => {
   } catch (error) {
     throw new Error(
       error.response?.data?.message || "Unable to delete note.",
+      { cause: error }
+    );
+  }
+};
+
+// --- NEW EXPORT & IMPORT API CALLS ---
+export const exportNotesApi = async () => {
+  try {
+    const response = await api.get("/notes/export");
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Unable to export notes.",
+      { cause: error }
+    );
+  }
+};
+
+export const importNotesApi = async (notesArray) => {
+  try {
+    const response = await api.post("/notes/import", { notes: notesArray });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Unable to import notes.",
       { cause: error }
     );
   }

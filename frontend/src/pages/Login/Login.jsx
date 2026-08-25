@@ -16,8 +16,22 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
+
+    // Custom Email Format Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address (e.g., you@example.com).');
+      return;
+    }
+
+    // Custom Password Length Validation
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const response = await loginUser({ email, password });
@@ -74,7 +88,8 @@ const Login = () => {
               </div>
             )}
 
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Note: novalidate used to prevent native browser popups */}
+            <form className="space-y-6" onSubmit={handleSubmit} noValidate>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-2">
                   Email address
@@ -82,8 +97,7 @@ const Login = () => {
                 <input
                   id="email"
                   name="email"
-                  type="email"
-                  required
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-4 py-3 border border-stone-200 rounded-2xl text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all sm:text-sm"
@@ -101,7 +115,6 @@ const Login = () => {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="appearance-none block w-full px-4 py-3 pr-12 border border-stone-200 rounded-2xl text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all sm:text-sm"

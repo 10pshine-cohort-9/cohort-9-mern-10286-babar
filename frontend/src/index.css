@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.rsw-ce ul {
+    list-style: disc !important;
+    padding-left: 2em !important;
+    margin: 1em 0 !important;
+  }
+  
+  .rsw-ce ol {
+    list-style: decimal !important;
+    padding-left: 2em !important;
+    margin: 1em 0 !important;
+  }

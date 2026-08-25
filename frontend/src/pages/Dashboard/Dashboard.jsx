@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getNotes, deleteNote } from '../../services/note.api';
+import { io } from 'socket.io-client';
+import { getNotes, deleteNote, exportNotesApi, importNotesApi } from '../../services/note.api';
 import { removeToken } from '../../services/token.service';
 
 const Dashboard = () => {
@@ -14,17 +15,28 @@ const Dashboard = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewingNote, setViewingNote] = useState(null);
 
+  // Toast notification state
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+
+  const fileInputRef = useRef(null);
   const navigate = useNavigate();
+
+  const showToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast({ show: false, message: '', type: 'success' });
+    }, 3500);
+  };
 
   const handleLogout = () => {
     removeToken();
     navigate('/login');
   };
 
-  const fetchUserNotes = async () => {
+  const fetchUserNotes = async (query = '') => {
     try {
       setIsLoading(true);
-      const response = await getNotes();
+      const response = await getNotes(query);
       const notesData = response?.data?.notes || response?.notes || response?.data || [];
       setNotes(notesData);
     } catch (err) {
@@ -35,8 +47,39 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchUserNotes();
-  }, []);
+    fetchUserNotes(searchQuery);
+  }, [searchQuery]);
+
+  // --- Socket.IO Real-Time Sync Effect ---
+  useEffect(() => {
+    const socket = io('http://localhost:5000');
+
+    socket.on('connect', () => {
+      console.log('Connected to real-time server:', socket.id);
+    });
+
+    socket.on('note_created', () => {
+      fetchUserNotes(searchQuery);
+      showToast('A new note was added from another window.');
+    });
+
+    socket.on('note_updated', () => {
+      fetchUserNotes(searchQuery);
+    });
+
+    socket.on('note_deleted', () => {
+      fetchUserNotes(searchQuery);
+    });
+
+    socket.on('notes_imported', () => {
+      fetchUserNotes(searchQuery);
+      showToast('Notes synchronized from another session.');
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [searchQuery]);
 
   const confirmDelete = async () => {
     if (!noteToDelete) return;
@@ -46,30 +89,81 @@ const Dashboard = () => {
       setNotes(notes.filter((note) => note.id !== noteToDelete));
       setNoteToDelete(null);
       setViewingNote(null);
+      showToast('Note deleted successfully.');
     } catch (err) {
-      alert(err.message || 'Failed to delete note.');
+      showToast(err.message || 'Failed to delete note.', 'error');
     } finally {
       setIsDeleting(false);
     }
   };
 
-  const query = searchQuery.toLowerCase();
+  // --- Export Handler ---
+  const handleExport = async () => {
+    try {
+      const response = await exportNotesApi();
+      const notesData = response?.data || notes;
+      
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(notesData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `notes_backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Notes exported successfully.');
+    } catch (err) {
+      showToast(err.message || 'Failed to export notes.', 'error');
+    }
+  };
+
+  // --- Import Handler ---
+  const handleImportFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const parsedData = JSON.parse(event.target.result);
+        const notesArray = Array.isArray(parsedData) ? parsedData : parsedData.data;
+        
+        if (!Array.isArray(notesArray)) {
+          throw new Error('Invalid JSON structure for notes backup.');
+        }
+
+        await importNotesApi(notesArray);
+        showToast('Notes successfully imported!');
+        fetchUserNotes(searchQuery);
+      } catch (err) {
+        showToast(err.message || 'Failed to parse or import backup file.', 'error');
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const filteredNotes = notes.filter((note) => {
-    const matchesSearch =
-      (note.title || '').toLowerCase().includes(query) ||
-      (note.content || '').toLowerCase().includes(query);
-    
     if (activeTab === 'recent') {
       const noteDate = new Date(note.createdAt);
       const daysAgo = (new Date() - noteDate) / (1000 * 60 * 60 * 24);
-      return matchesSearch && daysAgo <= 7;
+      return daysAgo <= 7;
     }
-    return matchesSearch;
+    return true;
   });
 
   return (
     <div className="min-h-screen bg-[#FAFAF9] text-stone-800 font-sans selection:bg-teal-100 selection:text-teal-900 relative">
       
+      {/* Hidden File Input for Importing */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImportFileChange}
+        accept=".json"
+        className="hidden"
+      />
+
       {/* Top Glass Navigation Bar */}
       <header className="bg-white/80 backdrop-blur-md border-b border-stone-200/80 sticky top-0 z-30 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -101,14 +195,34 @@ const Dashboard = () => {
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
-        {/* Header Title & CTA Action */}
+        {/* Header Title & Professional Actions */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-stone-900">Your Workspace</h1>
             <p className="text-sm text-stone-500 mt-1">Organize your thoughts, code snippets, and daily tasks in one clean view.</p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              onClick={handleExport}
+              title="Download all your notes as a backup file"
+              className="inline-flex items-center justify-center px-4 py-3 rounded-full bg-white border border-stone-200 text-stone-700 font-medium text-sm hover:bg-stone-50 transition-all gap-2 shadow-sm"
+            >
+              <svg className="w-4 h-4 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Export Data
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              title="Restore notes from a backup file"
+              className="inline-flex items-center justify-center px-4 py-3 rounded-full bg-white border border-stone-200 text-stone-700 font-medium text-sm hover:bg-stone-50 transition-all gap-2 shadow-sm"
+            >
+              <svg className="w-4 h-4 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Import Data
+            </button>
             <Link
               to="/notes/create"
               className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-teal-600 text-white font-medium text-sm hover:bg-teal-700 hover:shadow-lg hover:-translate-y-0.5 transition-all gap-2 shadow-md shadow-teal-600/20"
@@ -218,12 +332,14 @@ const Dashboard = () => {
                   onClick={() => setViewingNote(note)}
                   className="cursor-pointer flex-1"
                 >
-                  <h3 className="text-lg font-bold text-stone-900 mb-2 group-hover:text-teal-600 transition-colors line-clamp-1">
-                    {note.title}
-                  </h3>
-                  <p className="text-sm text-stone-600 line-clamp-4 leading-relaxed whitespace-pre-line mb-4 font-normal">
-                    {note.content}
-                  </p>
+                  <div 
+                    className="text-lg font-bold text-stone-900 mb-2 group-hover:text-teal-600 transition-colors line-clamp-1"
+                    dangerouslySetInnerHTML={{ __html: note.title }}
+                  />
+                  <div 
+                    className="text-sm text-stone-600 line-clamp-4 leading-relaxed mb-4 font-normal prose"
+                    dangerouslySetInnerHTML={{ __html: note.content }}
+                  />
                 </div>
                 
                 {/* Card Footer */}
@@ -271,16 +387,17 @@ const Dashboard = () => {
 
       </main>
 
-      {/* Read Note Full View Modal with Scroll View & Edit/Delete Actions */}
+      {/* Read Note Full View Modal */}
       {viewingNote && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl border border-stone-100 flex flex-col max-h-[85vh]">
-            
-            {/* Modal Header */}
             <div className="flex items-start justify-between pb-4 border-b border-stone-100 mb-4 shrink-0">
               <div>
                 <span className="text-xs font-semibold text-teal-600 uppercase tracking-wider block mb-1">Document Reader</span>
-                <h2 className="text-2xl font-bold text-stone-900">{viewingNote.title}</h2>
+                <div 
+                  className="text-2xl font-bold text-stone-900"
+                  dangerouslySetInnerHTML={{ __html: viewingNote.title }}
+                />
               </div>
               <button
                 onClick={() => setViewingNote(null)}
@@ -292,14 +409,13 @@ const Dashboard = () => {
               </button>
             </div>
 
-            {/* Scrollable Content Body with min-h-0 constraint */}
             <div className="flex-1 overflow-y-auto pr-2 my-2 min-h-0">
-              <p className="text-stone-700 leading-relaxed whitespace-pre-line text-sm sm:text-base font-normal">
-                {viewingNote.content}
-              </p>
+              <div 
+                className="text-stone-700 leading-relaxed text-sm sm:text-base font-normal prose"
+                dangerouslySetInnerHTML={{ __html: viewingNote.content }}
+              />
             </div>
 
-            {/* Modal Footer with Edit, Delete, and Close Actions */}
             <div className="flex items-center justify-between pt-4 border-t border-stone-100 text-xs text-stone-400 shrink-0 mt-4">
               <span>Created: {new Date(viewingNote.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}</span>
               
@@ -326,7 +442,6 @@ const Dashboard = () => {
                 </button>
               </div>
             </div>
-
           </div>
         </div>
       )}
@@ -361,6 +476,14 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Floating Toast Notification Banner */}
+      {toast.show && (
+        <div className="fixed bottom-6 right-6 z-50 animate-fade-in-up bg-stone-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-stone-800">
+          <div className={`w-2 h-2 rounded-full ${toast.type === 'error' ? 'bg-red-400' : 'bg-teal-400'} animate-pulse`}></div>
+          <span className="text-sm font-medium">{toast.message}</span>
         </div>
       )}
 
