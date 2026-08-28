@@ -62,10 +62,11 @@ The project includes backend and frontend setup, PostgreSQL integration, Prisma 
 - Centralized error/exception handling
 - Consistent error responses for API errors
 
-## Planned for future phases
+### Testing & Code Quality
 
-- Unit Testing (Mocha/Chai & Jest)
-- SonarQube Integration
+- Frontend unit testing (Jest)
+- Backend integration & unit testing (Mocha/Chai & Supertest)
+- SonarQube static code analysis and CNES report generation
 
 ---
 
@@ -117,6 +118,11 @@ frontend/
 ├── src/
 ├── public/
 └── package.json
+
+SonarQubeReport/
+├── dashboard-overview.png
+└── cnes-report-export.png
+
 ```
 
 ---
@@ -307,7 +313,7 @@ Current database implementation includes:
 | Logging | ✅ Completed |
 | Exception Handling | ✅ Completed |
 | Testing | ✅ Completed |
-| SonarQube | ⏳ Pending |
+| SonarQube | ✅ Completed |
 
 ---
 

@@ -1,0 +1,7 @@
+# SonarQube scanner local working files
+.scannerwork/
+
+# Node modules and build files
+node_modules/
+dist/
+build/
