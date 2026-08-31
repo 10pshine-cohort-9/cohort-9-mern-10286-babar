@@ -143,9 +143,11 @@ Install the following before running the project:
 Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/10pshine-cohort-9/cohort-9-mern-10286-babar
 
 cd cohort-9-mern-10286-babar
+
+git switch develop
 ```
 
 Install backend dependencies
